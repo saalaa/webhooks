@@ -6,7 +6,7 @@ Introduction
 
 This is a simple implementation of a webhooks server that will listen for
 queries and try to run scripts named after the path of the query it finds in
-the PATH environment variable.
+the `PATH` environment variable.
 
 To start the server:
 
@@ -17,8 +17,8 @@ Security Considerations
 
 There are a couple of things you will want to do when using this server:
 
-* Always restrict the PATH, either by setting it inline (as in the example) or
-  by using `export`
+* Always restrict the `PATH`, either by setting it inline (as in the example)
+  or by using `export`
 * Make sure you have sufficient rights to run the scripts correctly but
   certainly not *too much*
 * Rate limit the frontend web server if hooks come from a high activity SCM

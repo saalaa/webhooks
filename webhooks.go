@@ -8,42 +8,45 @@ import (
 	"net/http"
 	"os/exec"
 	"log"
-	"io"
 )
 
 func main () {
-	httpInterface := *flag.String("i", "127.0.0.1:8005", "Interface to listen to."
+	httpInterface := *flag.String("i", "127.0.0.1:8005", "Interface to listen to.")
 
 	http.HandleFunc("/", func (res http.ResponseWriter, req *http.Request) {
-		func reply(code int) {
-			if code == http.StatusOK {
-				log.Error(req.URL.Path, code)
-			} else {
-				log.Info(req.URL.Path, code)
-			}
+		var code int
+		var command *exec.Cmd
 
-			res.WriteHeader(code)
-		}
+		commandPath := "." + req.URL.Path
 
-		path, err := exec.LookPath(command)
+		path, err := exec.LookPath(commandPath)
 		if err != nil {
-			return reply(http.StatusNotImplemented)
+			code = http.StatusNotImplemented
+			goto exit
 		}
 
-		command := exec.Command(path)
+		command = exec.Command(path)
 
-		if len(req.URL.Query().Get("async")) > 0 {
+		if len(req.URL.Query().Get("async")) > 0 {
 			err := command.Start()
+
+			if err != nil {
+				code = http.StatusInternalServerError
+			}
 		} else {
 			err := command.Run()
+
+			if err != nil {
+				code = http.StatusInternalServerError
+			}
 		}
 
-		if err != nil {
-			return reply(http.StatusInternalServerError)
-		}
-
-		reply(http.StatusOK)
+	exit:
+		log.Println(req.URL.Path, path, code)
+		res.WriteHeader(code)
 	})
+
+	flag.Parse()
 
 	err := http.ListenAndServe(httpInterface, nil)
 	if err != nil {
