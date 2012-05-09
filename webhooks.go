@@ -5,9 +5,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"log"
 	"net/http"
 	"os/exec"
-	"log"
 )
 
 func main () {
@@ -41,9 +42,17 @@ func main () {
 			}
 		}
 
+		if code == 0 {
+			code = http.StatusOK
+		}
+
 	exit:
-		log.Println(req.URL.Path, path, code)
+		res.Header().Set("Content-Type", "application/json")
+
 		res.WriteHeader(code)
+		fmt.Fprintf(res, "{\"code\": %d, \"message\": %q}", code, http.StatusText(code))
+
+		log.Println(req.URL.Path, path, code)
 	})
 
 	flag.Parse()
