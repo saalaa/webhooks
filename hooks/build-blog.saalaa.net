@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-cd ~/blog.saala.net
-
-make pull all
