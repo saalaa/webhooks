@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"string"
 )
 
 func main () {
@@ -18,7 +19,15 @@ func main () {
 		var code int
 		var command *exec.Cmd
 
-		commandPath := "." + req.URL.Path
+		commandPath := req.URL.Path[1:]
+
+		// The behavior of LookPath() is not the one desired if a "/" is
+		// present. We thus deny such scripts and also completly avoid the
+		// problem of navigating in the file system.
+		if strings.contains(file, "/") {
+			code = http.StatusNotImplemented
+			goto exit
+		}
 
 		path, err := exec.LookPath(commandPath)
 		if err != nil {
